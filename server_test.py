@@ -55,6 +55,7 @@ async def offer(params: Offer):
     async def on_connectionstatechange():
         print("Connection state is %s" % pc.connectionState)
         if pc.connectionState == "failed":
+            print("Connection state is %s" % pc.connectionState)
             await pc.close()
             pcs.discard(pc)
 
