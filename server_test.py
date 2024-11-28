@@ -23,6 +23,8 @@ from starlette.templating import Jinja2Templates
 from starlette.responses import HTMLResponse
 
 
+pcs = set()
+
 app = FastAPI()
 
 
@@ -45,11 +47,16 @@ async def offer(params: Offer):
 
     pc = RTCPeerConnection()
 
-    # @pc.on("connectionstatechange")
-    # async def on_connectionstatechange():
-    #     print("Connection state is %s" % pc.connectionState)
-    #     if pc.connectionState == "failed":
-    #         await pc.close()
+    pcs.add(pc)
+
+
+
+    @pc.on("connectionstatechange")
+    async def on_connectionstatechange():
+        print("Connection state is %s" % pc.connectionState)
+        if pc.connectionState == "failed":
+            await pc.close()
+            pcs.discard(pc)
 
 
     player = MediaPlayer("1109668_Stairs_Standard_1280x720.mp4")
@@ -66,17 +73,17 @@ async def offer(params: Offer):
 
     await pc.setRemoteDescription(offer)
 
-    print('&&&&&&&&#########################################3')
+    # print('&&&&&&&&#########################################3')
 
     answer = await pc.createAnswer()
 
-    print(answer)
+    # print(answer)
 
-    print('============================')
+    # print('============================')
     await pc.setLocalDescription(answer)
 
 
-    print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
+    # print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
 
 
     # print(pc.localDescription.sdp)
