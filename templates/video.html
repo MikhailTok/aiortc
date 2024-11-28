@@ -95,6 +95,17 @@ var pc = null;
     //         pc.close();
     //     }, 500);
     // }
+
+
+    function stop() {
+    // document.getElementById('stop').style.display = 'none';
+
+    // close peer connection
+    setTimeout(() => {
+        pc.close();
+        pc = null;
+    }, 500);
+}
     </script>
 
 
@@ -107,5 +118,7 @@ var pc = null;
 <button onclick="start()">Start</button>
 
 <button onclick="get_streams()">get stream</button>
+
+<button id="stop" onclick="stop()">Stop</button>
 </body>
 </html>

@@ -49,8 +49,6 @@ async def offer(params: Offer):
 
     pcs.add(pc)
 
-
-
     @pc.on("connectionstatechange")
     async def on_connectionstatechange():
         print("Connection state is %s" % pc.connectionState)
@@ -61,36 +59,12 @@ async def offer(params: Offer):
 
 
     player = MediaPlayer("1109668_Stairs_Standard_1280x720.mp4")
-
-    # player2 = MediaPlayer("1109668_Stairs_Standard_1280x720.mp4")
-    # pc.addTrack(player.video)
-
-    # player2 = MediaPlayer('rtsp://rtspstream:853f25dc3a217ea0fa5aec30e90d45d7@zephyr.rtsp.stream/pattern')
-
+    # player = MediaPlayer('rtsp://rtspstream:853f25dc3a217ea0fa5aec30e90d45d7@zephyr.rtsp.stream/pattern')
     pc.addTrack(player.video)
 
-    # pc.addTrack(player2.video)
-
-
     await pc.setRemoteDescription(offer)
-
-    # print('&&&&&&&&#########################################3')
-
     answer = await pc.createAnswer()
-
-    # print(answer)
-
-    # print('============================')
     await pc.setLocalDescription(answer)
-
-
-    # print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
-
-
-    # print(pc.localDescription.sdp)
-    # print(pc.localDescription.type)
-
-
     return {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type}
 
 
