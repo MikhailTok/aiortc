@@ -48,6 +48,8 @@ function start() {
         sdpSemantics: 'unified-plan'
     };
 
+    config.iceServers = [{ urls: ['stun:stun.l.google.com:19302'] }];
+
 
 
     pc = new RTCPeerConnection(config);
