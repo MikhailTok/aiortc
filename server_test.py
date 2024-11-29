@@ -58,8 +58,8 @@ async def offer(params: Offer):
             pcs.discard(pc)
 
 
-    player = MediaPlayer("1109668_Stairs_Standard_1280x720.mp4")
-    # player = MediaPlayer('rtsp://rtspstream:853f25dc3a217ea0fa5aec30e90d45d7@zephyr.rtsp.stream/pattern')
+    # player = MediaPlayer("1109668_Stairs_Standard_1280x720.mp4")
+    player = MediaPlayer('rtsp://rtspstream:853f25dc3a217ea0fa5aec30e90d45d7@zephyr.rtsp.stream/pattern')
     pc.addTrack(player.video)
 
     await pc.setRemoteDescription(offer)

@@ -1,5 +1,4 @@
 
-
 var pc = null;
 
 function negotiate() {
@@ -75,61 +74,12 @@ function get_streams() {
     console.log(pc)
 };
 
+function stop() {
+    // document.getElementById('stop').style.display = 'none';
 
-
-// function stop() {
-//     document.getElementById('stop').style.display = 'none';
-
-//     // close peer connection
-//     setTimeout(() => {
-//         pc.close();
-//     }, 500);
-// }
-
-
-
-
-
-
-// console.log('Hello')
-
-
-
-// async function  Start() {
-//     console.log("From function")
-
-//     var config = {
-//         sdpSemantics: 'unified-plan'
-//     };
-
-//     pc = new RTCPeerConnection(config);
-
-//     pc.addEventListener('track', (evt) => {
-//         if (evt.track.kind == 'video') {
-//             document.getElementById('video').srcObject = evt.streams[0];
-//         } else {
-//             document.getElementById('audio').srcObject = evt.streams[0];
-//         }
-//     });
-
-//     pc.addTransceiver('video', { direction: 'recvonly' });
-
-//     const offer = await pc.createOffer();
-    
-//     await pc.setLocalDescription(offer);
-
-//     var complete_offer = pc.localDescription;
-
-
-//     var responce = await fetch("http://127.0.0.1:5000/offer", {
-//         method: "POST",
-//         body: JSON.stringify({sdp: complete_offer.sdp, type: complete_offer.type,}),
-//         headers: {"Content-type": "application/json; charset=UTF-8"}
-//     });
-
-//     answer = await responce.json();
-
-
-//     pc.setRemoteDescription(answer);
-
-// }
+    // close peer connection
+    setTimeout(() => {
+        pc.close();
+        pc = null;
+    }, 500);
+}
