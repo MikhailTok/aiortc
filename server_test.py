@@ -9,7 +9,7 @@ import asyncio
 # app = Flask(__name__)
 
 from aiortc import RTCPeerConnection, RTCSessionDescription
-from aiortc.contrib.media import MediaPlayer, MediaRelay
+from aiortc.contrib.media import MediaPlayer, MediaRelay, MediaStreamTrack
 from aiortc.rtcrtpsender import RTCRtpSender
 import logging
 
@@ -23,11 +23,31 @@ from starlette.templating import Jinja2Templates
 from starlette.responses import HTMLResponse
 
 
+
+relay = MediaRelay()
+
+
+class VideoTransformTrack(MediaStreamTrack):
+    """
+    A video stream track that transforms frames from an another track.
+    """
+
+    kind = "video"
+
+    def __init__(self, track, transform):
+        super().__init__()  # don't forget this!
+        self.track = track
+        self.transform = transform
+
+    async def recv(self):
+        frame = await self.track.recv()
+        return frame
+
+    
+
 pcs = set()
 
 app = FastAPI()
-
-
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -58,60 +78,20 @@ async def offer(params: Offer):
             pcs.discard(pc)
 
 
+    @pc.on("track")
+    def on_track(track):
+        print("Track %s received" % track.kind)
+
+        if track.kind == "video":
+            pc.addTrack(VideoTransformTrack(relay.subscribe(track), None))
+
     # player = MediaPlayer("1109668_Stairs_Standard_1280x720.mp4")
-    player = MediaPlayer('rtsp://rtspstream:853f25dc3a217ea0fa5aec30e90d45d7@zephyr.rtsp.stream/pattern')
-    pc.addTrack(player.video)
+    # player = MediaPlayer('rtsp://rtspstream:853f25dc3a217ea0fa5aec30e90d45d7@zephyr.rtsp.stream/pattern')
+    # pc.addTrack(player.video)
+
+    
 
     await pc.setRemoteDescription(offer)
     answer = await pc.createAnswer()
     await pc.setLocalDescription(answer)
     return {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type}
-
-
-
-# @app.route("/")
-# def index():
-#     return render_template("video.html")
-
-
-# @app.route("/offer", methods=["POST"])
-# async def offer():
-
-#     params = request.json
-
-#     # print(params)
-#     offer = RTCSessionDescription(sdp=params["sdp"], type=params["type"])
-
-#     pc = RTCPeerConnection()
-
-#     @pc.on("connectionstatechange")
-#     async def on_connectionstatechange():
-#         print("Connection state is %s" % pc.connectionState)
-#         if pc.connectionState == "failed":
-#             await pc.close()
-
-
-#     player = MediaPlayer("1109668_Stairs_Standard_1280x720.mp4")
-
-#     pc.addTrack(player.video)
-
-#     # force_codec(pc, video_sender, 'video/H264')
-
-#     await pc.setRemoteDescription(offer)
-
-#     answer = await pc.createAnswer()
-#     await pc.setLocalDescription(answer)
-
-#     print('================')
-#     print(pc.iceConnectionState)
-#     print('================')
-
-#     return {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type}
-
-
-
-
-
-# if __name__ == '__main__':
-#     logging.basicConfig(level=logging.INFO)
-#     app.run(host='0.0.0.0', port=8080, debug=True)

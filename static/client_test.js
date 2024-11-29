@@ -2,8 +2,8 @@
 var pc = null;
 
 function negotiate() {
-    pc.addTransceiver('video', { direction: 'recvonly' });
-    pc.addTransceiver('audio', { direction: 'recvonly' });
+    pc.addTransceiver('video', { direction: "sendrecv" });
+    // pc.addTransceiver('audio', { direction: "sendrecv" });
     return pc.createOffer().then((offer) => {
         return pc.setLocalDescription(offer);
     }).then(() => {
@@ -60,6 +60,35 @@ function start() {
     //     } 
     // });
 
+
+//     navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+//     // Здесь вы можете использовать поток, например, добавить его в элемент <video>
+//     const videoElement = document.querySelector('video2');
+//     videoElement.srcObject = stream;
+
+//     stream.getTracks().forEach(track => {
+//         pc.addTrack(track, stream);
+//       });
+//     }).catch(error => {
+//     console.error('Ошибка доступа к камере:', error);
+//   });
+
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then(function(stream) {
+        video = document.getElementById('video2');
+        video.srcObject = stream;
+        video.play();
+
+        stream.getTracks().forEach((track) => {
+            pc.addTrack(track, stream);
+        });
+
+
+    });
+
+
+
+
     pc.addEventListener('track', (evt) => {
             document.getElementById('video').srcObject = evt.streams[0];
     });
@@ -74,7 +103,7 @@ function get_streams() {
     console.log(pc)
 };
 
-function stop() {
+    function stop() {
     // document.getElementById('stop').style.display = 'none';
 
     // close peer connection
