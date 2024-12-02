@@ -86,9 +86,6 @@ function start() {
 
     });
 
-
-
-
     pc.addEventListener('track', (evt) => {
             document.getElementById('video').srcObject = evt.streams[0];
     });

@@ -22,10 +22,19 @@ from starlette.requests import Request
 from starlette.templating import Jinja2Templates
 from starlette.responses import HTMLResponse
 
+from av import VideoFrame
 
+from ultralytics import YOLO
+
+# Load a model
+# model = YOLO("yolov8n.pt")  # pretrained YOLOv8n model
+
+model = YOLO("yolo11n.pt")
 
 relay = MediaRelay()
 
+counter = 0
+detection = None
 
 class VideoTransformTrack(MediaStreamTrack):
     """
@@ -38,9 +47,49 @@ class VideoTransformTrack(MediaStreamTrack):
         super().__init__()  # don't forget this!
         self.track = track
         self.transform = transform
+        
+        self.counter = 0
+        self.frequency = 1
+        self.detection = None
 
     async def recv(self):
         frame = await self.track.recv()
+
+        self.counter += 1
+
+        # img = frame.to_ndarray(format="bgr24")
+ 
+        if self.counter % 100 == 1:
+            img = frame.to_ndarray(format="bgr24")
+
+            results = model(img)  # return a list of Results objects
+
+            self.detection = results
+
+            for i, r in enumerate(results):
+                # Plot results image
+                im_bgr = r.plot()  # BGR-order numpy array
+                # im_rgb = Image.fromarray(im_bgr[..., ::-1])  # RGB-order PIL image
+
+            new_frame = VideoFrame.from_ndarray(im_bgr, format="bgr24")
+            new_frame.pts = frame.pts
+            new_frame.time_base = frame.time_base
+
+            return new_frame
+        
+        img = frame.to_ndarray(format="bgr24")
+
+        if self.detection:
+            for i, r in enumerate(self.detection):
+                # Plot results image
+                im_bgr = r.plot()  # BGR-order numpy array
+                # im_rgb = Image.fromarray(im_bgr[..., ::-1])  # RGB-order PIL image
+
+            new_frame = VideoFrame.from_ndarray(im_bgr, format="bgr24")
+            new_frame.pts = frame.pts
+            new_frame.time_base = frame.time_base
+            return new_frame
+
         return frame
 
     
