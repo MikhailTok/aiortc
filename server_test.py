@@ -55,42 +55,24 @@ class VideoTransformTrack(MediaStreamTrack):
     async def recv(self):
         frame = await self.track.recv()
 
-        self.counter += 1
 
-        # img = frame.to_ndarray(format="bgr24")
- 
-        if self.counter % 100 == 1:
-            img = frame.to_ndarray(format="bgr24")
-
-            results = model(img)  # return a list of Results objects
-
-            self.detection = results
-
-            for i, r in enumerate(results):
-                # Plot results image
-                im_bgr = r.plot()  # BGR-order numpy array
-                # im_rgb = Image.fromarray(im_bgr[..., ::-1])  # RGB-order PIL image
-
-            new_frame = VideoFrame.from_ndarray(im_bgr, format="bgr24")
-            new_frame.pts = frame.pts
-            new_frame.time_base = frame.time_base
-
-            return new_frame
-        
         img = frame.to_ndarray(format="bgr24")
 
-        if self.detection:
-            for i, r in enumerate(self.detection):
-                # Plot results image
-                im_bgr = r.plot()  # BGR-order numpy array
-                # im_rgb = Image.fromarray(im_bgr[..., ::-1])  # RGB-order PIL image
+        results = model(img)  # return a list of Results objects
 
-            new_frame = VideoFrame.from_ndarray(im_bgr, format="bgr24")
-            new_frame.pts = frame.pts
-            new_frame.time_base = frame.time_base
-            return new_frame
+        self.detection = results
 
-        return frame
+        for i, r in enumerate(results):
+            # Plot results image
+            im_bgr = r.plot()  # BGR-order numpy array
+            # im_rgb = Image.fromarray(im_bgr[..., ::-1])  # RGB-order PIL image
+
+        new_frame = VideoFrame.from_ndarray(im_bgr, format="bgr24")
+        new_frame.pts = frame.pts
+        new_frame.time_base = frame.time_base
+
+        return new_frame
+
 
     
 
